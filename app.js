@@ -11,6 +11,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import compression from "compression";
 import sponsorRouter from "./routes/sponsorRoutes.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./docs/swaggerConfig.js";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,9 +49,11 @@ app.use(express.json());
 
 connectDB();
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/v1/sponsors", sponsorRouter);
 app.use("/api/v1/jobs", jobRoutes);
 app.use("/api/v1/user", userRouter);
+
 
 app.use((err, req, res, next) => {
   logger.error(err.message);
@@ -59,7 +63,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 6000;
+const PORT =  6000;
 const server = app.listen(PORT, () =>
   logger.info(`Server is running on Port ${PORT}`)
 );
