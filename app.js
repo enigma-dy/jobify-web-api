@@ -21,7 +21,17 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const corsOptions = {
-  origin: "https://jobify-liart-two.vercel.app",
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://jobify-liart-two.vercel.app",
+      "http://localhost:5173",
+    ];
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true); 
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
