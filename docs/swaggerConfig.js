@@ -1,7 +1,6 @@
 import swaggerJsDoc from "swagger-jsdoc";
 
 
-
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
@@ -15,7 +14,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "http://localhost:6000/api",
+      url: "https://jobify-web-api.onrender.com/api/v1",
       description: "Development server",
     },
   ],
