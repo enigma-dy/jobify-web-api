@@ -1,7 +1,7 @@
 {
   "name": "jobify",
   "version": "1.0.0",
-  "main": "indexapp.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
     "start": "node app.js",

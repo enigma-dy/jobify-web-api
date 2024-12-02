@@ -51,7 +51,7 @@ export const loginUser = async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await user.findOne({ email });
 
     if (!user) {
       return res.status(401).json({
