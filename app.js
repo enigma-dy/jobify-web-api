@@ -26,7 +26,6 @@ const corsOptions = {
     const allowedOrigins = [
       "https://jobify-liart-two.vercel.app",
       "http://localhost:5173",
-      "http://localhost:3000",
     ];
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
@@ -37,6 +36,7 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
+app.use(cors(corsOptions));
 
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 
