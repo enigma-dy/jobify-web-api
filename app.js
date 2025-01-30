@@ -19,15 +19,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.use(express.json());
 
 const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
       "https://jobify-liart-two.vercel.app",
       "http://localhost:5173",
+      "http://localhost:3000",
     ];
     if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true); 
+      callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
@@ -35,8 +37,6 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
-
-app.use(cors(corsOptions));
 
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 
@@ -64,7 +64,6 @@ app.use("/api/v1/sponsors", sponsorRouter);
 app.use("/api/v1/jobs", jobRoutes);
 app.use("/api/v1/user", userRouter);
 
-
 app.use((err, req, res, next) => {
   logger.error(err.message);
   res.status(err.status || 500).json({
@@ -73,7 +72,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT =  process.env.PORT||3000;
+const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () =>
   logger.info(`Server is running on Port ${PORT}`)
 );

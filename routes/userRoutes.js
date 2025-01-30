@@ -20,7 +20,6 @@ import {
 import { restrictTo } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddlerware.js";
 
-
 const userRouter = express.Router();
 
 /**

@@ -38,6 +38,8 @@ export const registerUser = async (req, res) => {
   } catch (error) {
     logger.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -51,7 +53,7 @@ export const loginUser = async (req, res, next) => {
       });
     }
 
-    const user = await user.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(401).json({
@@ -70,7 +72,7 @@ export const loginUser = async (req, res, next) => {
       });
     }
 
-    const token = User.Tokenize();
+    const token = user.Tokenize();
 
     res.status(200).json({
       status: "sucessfull",
@@ -143,9 +145,7 @@ export const authenticateUser = async (req, res, next) => {
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decodedToken;
-
-    const currentUser = await User.findById(req.user.id);
+    const currentUser = await User.findById(decodedToken.id);
 
     if (!currentUser) {
       return res
@@ -154,10 +154,12 @@ export const authenticateUser = async (req, res, next) => {
     }
 
     req.user = currentUser;
+    console.log("Authenticated User:", req.user); // Debugging log
+
     next();
   } catch (err) {
     logger.error(err);
-    res.status(500).json({ message: "Server error", error: err });
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 

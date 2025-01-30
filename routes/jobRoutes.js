@@ -8,12 +8,13 @@ import {
   getFeaturedJobs,
   getJobApplicants,
   deleteJob,
+  getJobCount,
+  getUserJobs,
+  getJobApplications,
 } from "../controllers/jobController.js";
 import { restrictTo } from "../middlewares/authMiddleware.js";
 import { authenticateUser } from "../controllers/authController.js";
 import upload from "../middlewares/uploadMiddlerware.js";
-
-
 
 const router = express.Router();
 
@@ -44,7 +45,7 @@ const router = express.Router();
  *                   items:
  *                     $ref: '#/components/schemas/Job'
  */
-router.get("", allJob)
+router.get("", allJob);
 
 /**
  * @swagger
@@ -70,7 +71,7 @@ router.get("", allJob)
  *                   items:
  *                     type: string
  */
-router.get("/categories", getJobCategories)
+router.get("/categories", getJobCategories);
 
 /**
  * @swagger
@@ -96,7 +97,7 @@ router.get("/categories", getJobCategories)
  *                   items:
  *                     $ref: '#/components/schemas/Job'
  */
-router.get("/featured", getFeaturedJobs)
+router.get("/featured", getFeaturedJobs);
 
 /**
  * @swagger
@@ -126,7 +127,7 @@ router.get("/featured", getFeaturedJobs)
  *       500:
  *         description: Server error.
  */
-router.get("/:id", getJob)
+router.get("/:id", getJob);
 
 /**
  * @swagger
@@ -166,7 +167,7 @@ router.get(
   authenticateUser,
   restrictTo("employer"),
   getJobApplicants
-)
+);
 
 /**
  * @swagger
@@ -192,12 +193,26 @@ router.get(
  *       500:
  *         description: Server error.
  */
-router.post(
-  "",
+router.post("", authenticateUser, restrictTo("employer", "admin"), createJob);
+
+router.get(
+  "/count",
   authenticateUser,
   restrictTo("employer", "admin"),
-  createJob
-)
+  getJobCount
+);
+router.get(
+  "/user-jobs",
+  authenticateUser,
+  restrictTo("employer", "admin"),
+  getUserJobs
+);
+router.get(
+  "/applications",
+  authenticateUser,
+  restrictTo("employer", "admin"),
+  getJobApplications
+);
 
 /**
  * @swagger
@@ -242,7 +257,7 @@ router.post(
     { name: "coverLetter", maxCount: 1 },
   ]),
   applyForJob
-)
+);
 
 /**
  * @swagger
@@ -270,6 +285,11 @@ router.post(
  *       500:
  *         description: Server error.
  */
-router.delete("/job", authenticateUser, restrictTo("employer", "admin"), deleteJob)
+router.delete(
+  "/job",
+  authenticateUser,
+  restrictTo("employer", "admin"),
+  deleteJob
+);
 
 export default router;

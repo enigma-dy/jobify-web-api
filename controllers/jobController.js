@@ -59,41 +59,53 @@ export const getJob = async (req, res, next) => {
 
 export const createJob = async (req, res, next) => {
   try {
-    const { title, description, company, salary, jobType, requirement } =
-      req.body;
+    const {
+      title,
+      description,
+      salary,
+      jobType,
+      requirement,
+      company,
+      category,
+      featured,
+      remote,
+      benefits,
+      applicationDeadline,
+    } = req.body;
 
     if (
       !title ||
       !description ||
-      !company ||
+      !company?.name ||
+      !company?.website ||
+      !company?.location ||
       !salary ||
       !jobType ||
-      !requirement
+      !requirement?.length
     ) {
-      return res.status(400).json({
-        message: "Please fill all required fields",
-      });
+      return res
+        .status(400)
+        .json({ message: "Please fill all required fields correctly" });
     }
 
     const job = await Job.create({
       title,
       description,
       company,
+      category,
       salary,
       jobType,
+      featured,
+      remote,
       requirement,
+      benefits,
+      applicationDeadline,
       createdBy: req.user._id,
     });
 
-    res.status(201).json({
-      status: "successful",
-      data: job,
-    });
+    return res.status(201).json({ status: "successful", data: job });
   } catch (err) {
-    res.status(500).json({
-      message: "Server error",
-    });
-    next(err);
+    next(err); // Avoid multiple responses
   }
 };
 
@@ -265,43 +277,49 @@ export const getJobApplicants = async (req, res, next) => {
   }
 };
 
-export const getAdminStats = async (req, res, next) => {
+export const getJobCount = async (req, res, next) => {
   try {
-    const jobSeekers = await User.find({ role: "job_seeker" }).populate({
-      path: "applications",
-      populate: { path: "job" },
-    });
-
-    const employers = await User.find({ role: "employer" }).populate({
-      path: "jobs",
-      model: "Job",
-    });
-
-    const jobSeekerStats = jobSeekers.map((seeker) => ({
-      user: seeker,
-      applications: seeker.applications.length,
-    }));
-
-    const employerStats = employers.map((employer) => ({
-      user: employer,
-      jobsPosted: employer.jobs.length,
-    }));
-
-    const allUsers = await User.find();
+    // console.log(req.user);
+    // const userId = new mongoose.Types.ObjectId(req.user._id);
+    // const jobCount = await Job.countDocuments({ createdBy: userId });
 
     res.status(200).json({
       status: "success",
-      stats: {
-        totalUsers: allUsers.length,
-        jobSeekers: jobSeekers.length,
-        employers: employers.length,
-        jobSeekerStats,
-        employerStats,
-      },
+      // data: { jobCount },
     });
   } catch (err) {
-    logger.error("error", err);
-    res.status(ERROR_CODES.SERVER_ERROR).json({ message: "sever error" });
+    next(err);
+  }
+};
+
+export const getUserJobs = async (req, res, next) => {
+  try {
+    const userJobs = await Job.find({ createdBy: req.user._id });
+
+    res.status(200).json({
+      status: "success",
+      data: { userJobs },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getJobApplications = async (req, res, next) => {
+  try {
+    const userJobs = await Job.find({ createdBy: req.user._id });
+
+    const applications = await JobApplication.find({
+      job: { $in: userJobs.map((job) => job._id) },
+    })
+      .populate("user", "name email")
+      .populate("job", "title description company");
+
+    res.status(200).json({
+      status: "success",
+      data: { applications },
+    });
+  } catch (err) {
     next(err);
   }
 };
