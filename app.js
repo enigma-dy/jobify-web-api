@@ -26,6 +26,7 @@ const corsOptions = {
     const allowedOrigins = [
       "https://jobify-liart-two.vercel.app",
       "http://localhost:5173",
+      "https://oluwagbengaapidocs.netlify.app/",
       "https://scintillating-kitten-95c111.netlify.app"
     ];
     if (allowedOrigins.includes(origin) || !origin) {
